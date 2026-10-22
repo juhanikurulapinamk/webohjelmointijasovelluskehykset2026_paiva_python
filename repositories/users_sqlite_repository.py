@@ -7,12 +7,10 @@ from models import User
 
 
 class UsersSQLiteRepository:
-    def __init__(self):
-        self.connection = sqlite3.connect('tuntiharjoitus1.db')
+    def __init__(self, con):
+        self.connection = con
 
-    def __del__(self):
-        if self.connection is not None:
-            self.connection.close()
+    
 
 
     def get_all(self):

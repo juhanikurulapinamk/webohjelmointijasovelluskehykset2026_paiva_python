@@ -1,14 +1,17 @@
 from flask import jsonify, render_template, request
 
 from custom_exceptions.not_found_exception import NotFoundException
+
+from decorators.users_repository import get_users_repository
 from models import User
 from repositories.factories import create_users_repository
 from repositories.users_sqlite_repository import UsersSQLiteRepository
 
 
-def get_all_users_handler():
+@get_users_repository
+def get_all_users_handler(repo):
     try:
-            repo = create_users_repository()
+            
             users = repo.get_all()
             users_json_list = []
             for user in users:
@@ -24,22 +27,22 @@ def get_all_users_handler():
     except Exception as e:
          return jsonify({'err': str(e)}), 500
 
-
-def add_user_handler():
+@get_users_repository
+def add_user_handler(repo):
     try:
          req_data = request.get_json()
          new_user = User(req_data['first_name'], req_data['last_name'], req_data['username'])
-         repo = create_users_repository()
+         
          repo.save(new_user)
          return jsonify({'id': new_user.id, 'first_name': new_user.firstname, 'last_name': new_user.lastname, 'username': new_user.username})
     except Exception as e:
          return jsonify({'err': str(e)}), 500
 
 
-
-def update_user_by_id_handler(_id):
+@get_users_repository
+def update_user_by_id_handler(repo, _id):
     try:
-            repo = create_users_repository()
+            
             user = repo.get_by_id(_id)
             
             request_data = request.get_json()
@@ -60,10 +63,10 @@ def update_user_by_id_handler(_id):
     except Exception as e:
         return jsonify({'err': str(e)}), 500
 
-
-def remove_user_by_id(_id):
+@get_users_repository
+def remove_user_by_id(repo, _id):
     try:
-        repo = create_users_repository()
+        
         user = repo.get_by_id(_id)
         repo.remove(user.id)
         # User.remove_by_id(_id)
@@ -74,8 +77,8 @@ def remove_user_by_id(_id):
     except Exception as e:
         return jsonify({'err': str(e)}), 500
 
-
-def get_user_by_id(_id):
+@get_users_repository
+def get_user_by_id(repo, _id):
     try:
         repo = create_users_repository()
         user = repo.get_by_id(_id)
