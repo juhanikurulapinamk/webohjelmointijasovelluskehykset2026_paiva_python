@@ -2,11 +2,13 @@ from flask import jsonify, render_template, request
 
 from custom_exceptions.not_found_exception import NotFoundException
 from models import User
+from repositories.users_sqlite_repository import UsersSQLiteRepository
 
 
 def get_all_users_handler():
     try:
-            users = User.get_all()
+            repo = UsersSQLiteRepository()
+            users = repo.get_all()
             users_json_list = []
             for user in users:
                 users_json_list.append({
@@ -26,7 +28,8 @@ def add_user_handler():
     try:
          req_data = request.get_json()
          new_user = User(req_data['first_name'], req_data['last_name'], req_data['username'])
-         new_user.save()
+         repo = UsersSQLiteRepository()
+         repo.save(new_user)
          return jsonify({'id': new_user.id, 'first_name': new_user.firstname, 'last_name': new_user.lastname, 'username': new_user.username})
     except Exception as e:
          return jsonify({'err': str(e)}), 500
@@ -35,8 +38,8 @@ def add_user_handler():
 
 def update_user_by_id_handler(_id):
     try:
-            
-            user = User.get_by_id(_id)
+            repo = UsersSQLiteRepository()
+            user = repo.get_by_id(_id)
             
             request_data = request.get_json()
 
@@ -47,7 +50,7 @@ def update_user_by_id_handler(_id):
             user.firstname = new_first_name
             user.lastname = new_last_name
             user.username = new_username
-            user.save()
+            repo.save(user)
             
             return jsonify(
                 {'id': user.id, 'first_name': user.firstname, 'last_name': user.lastname, 'username': user.username})
@@ -59,8 +62,9 @@ def update_user_by_id_handler(_id):
 
 def remove_user_by_id(_id):
     try:
-        user = User.get_by_id(_id)
-        user.remove()
+        repo = UsersSQLiteRepository()
+        user = repo.get_by_id(_id)
+        repo.remove(user.id)
         # User.remove_by_id(_id)
         return "", 204
 
@@ -72,7 +76,8 @@ def remove_user_by_id(_id):
 
 def get_user_by_id(_id):
     try:
-        user = User.get_by_id(_id)
+        repo = UsersSQLiteRepository()
+        user = repo.get_by_id(_id)
         return jsonify({
              'id': user.id,
              'first_name': user.firstname,
