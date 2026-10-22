@@ -2,12 +2,13 @@ from flask import jsonify, render_template, request
 
 from custom_exceptions.not_found_exception import NotFoundException
 from models import User
+from repositories.factories import create_users_repository
 from repositories.users_sqlite_repository import UsersSQLiteRepository
 
 
 def get_all_users_handler():
     try:
-            repo = UsersSQLiteRepository()
+            repo = create_users_repository()
             users = repo.get_all()
             users_json_list = []
             for user in users:
@@ -28,7 +29,7 @@ def add_user_handler():
     try:
          req_data = request.get_json()
          new_user = User(req_data['first_name'], req_data['last_name'], req_data['username'])
-         repo = UsersSQLiteRepository()
+         repo = create_users_repository()
          repo.save(new_user)
          return jsonify({'id': new_user.id, 'first_name': new_user.firstname, 'last_name': new_user.lastname, 'username': new_user.username})
     except Exception as e:
@@ -38,7 +39,7 @@ def add_user_handler():
 
 def update_user_by_id_handler(_id):
     try:
-            repo = UsersSQLiteRepository()
+            repo = create_users_repository()
             user = repo.get_by_id(_id)
             
             request_data = request.get_json()
@@ -62,7 +63,7 @@ def update_user_by_id_handler(_id):
 
 def remove_user_by_id(_id):
     try:
-        repo = UsersSQLiteRepository()
+        repo = create_users_repository()
         user = repo.get_by_id(_id)
         repo.remove(user.id)
         # User.remove_by_id(_id)
@@ -76,7 +77,7 @@ def remove_user_by_id(_id):
 
 def get_user_by_id(_id):
     try:
-        repo = UsersSQLiteRepository()
+        repo = create_users_repository()
         user = repo.get_by_id(_id)
         return jsonify({
              'id': user.id,

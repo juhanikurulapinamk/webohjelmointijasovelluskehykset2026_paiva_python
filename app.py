@@ -23,6 +23,8 @@ Tehdään tämä seuraavaksi käyttäen MVC:tä.
 
 
 
+
+
 # Hakee kaikki käyttäjät JSON-muodossa
 #@app.route('/api/users', methods=['GET'])
 
@@ -52,4 +54,4 @@ app.add_url_rule('/api/users/<_id>', 'remove_user_by_id', users_controller.remov
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=5001)
